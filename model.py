@@ -73,7 +73,6 @@ class TempestEngine(object):
 		return self.replies[index]
 
 	def get_wordnet_pos(self, word):
-		"""Map POS tag to first character lemmatize() accepts"""
 		tag = nltk.pos_tag([word])[0][1][0].upper()
 		
 		tag_dict = {"J": wordnet.ADJ,

@@ -10,5 +10,5 @@ tempest = TempestEngine(url1)
 
 while True:
 	task = input("Enter a query: ")
-	# tempest.get_query_reply(task)
-	print (tempest.clean_query(task))
+	cleaned_query = tempest.clean_query(task)
+	tempest.get_query_reply(cleaned_query)
