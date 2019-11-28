@@ -5,6 +5,9 @@ import numpy as np
 import gensim
 from gensim.parsing.preprocessing import STOPWORDS
 
+from spacy.lemmatizer import Lemmatizer
+from spacy.lookups import Lookups
+
 nlp = spacy.load("en_core_web_lg")
 
 class TempestEngine(object):
@@ -45,7 +48,10 @@ class TempestEngine(object):
 		# remove stop words
 
 		# lematize all words
-		pass
+		lemmatizer = Lemmatizer()
+		lemmas = lemmatizer(query)
+
+		return lemmas
 
 	def find_similarity(self, query):
 		query_tokens = nlp(query)
