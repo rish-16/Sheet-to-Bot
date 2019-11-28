@@ -2,11 +2,10 @@ import requests
 import json
 import spacy
 import numpy as np
-import gensim
-from gensim.parsing.preprocessing import STOPWORDS
-
-from spacy.lemmatizer import Lemmatizer
+import nltk
+from nltk.stem import WordNetLemmatizer 
 from spacy.lookups import Lookups
+from nltk.corpus import wordnet
 
 nlp = spacy.load("en_core_web_lg")
 
@@ -45,11 +44,12 @@ class TempestEngine(object):
 		self.intents = self.intents[1:]
 
 	def clean_query(self, query):
+		tokens = nltk.word_tokenize(query)
 		# remove stop words
 
 		# lematize all words
-		lemmatizer = Lemmatizer()
-		lemmas = lemmatizer(query)
+		lemmatizer = WordNetLemmatizer()
+		lemmas = ' '.join([lemmatizer.lemmatize(word, get_wordnet_pos(word)) for word in tokens])
 
 		return lemmas
 
@@ -70,5 +70,18 @@ class TempestEngine(object):
 		index = np.argmax(sim)
 		return self.replies[index]
 
+		def get_wordnet_pos(self, word):
+			"""Map POS tag to first character lemmatize() accepts"""
+			tag = nltk.pos_tag([word])[0][1][0].upper()
+			
+			tag_dict = {"J": wordnet.ADJ,
+					"N": wordnet.NOUN,
+					"V": wordnet.VERB,
+					"R": wordnet.ADV}
+
+			return tag_dict.get(tag, wordnet.NOUN)		
+
 	def find_pos(self, query):
-		pass
+		tokens = nltk.word_tokenize(query)
+		pos_tag_tokens = nltk.pos_tag(tokens)
+		return pos_tag_tokens
