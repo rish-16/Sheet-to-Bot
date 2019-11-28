@@ -4,8 +4,8 @@ import spacy
 import numpy as np
 import nltk
 from nltk.stem import WordNetLemmatizer 
-from spacy.lookups import Lookups
 from nltk.corpus import wordnet
+from nltk.corpus import stopwords
 
 nlp = spacy.load("en_core_web_lg")
 
@@ -46,10 +46,12 @@ class TempestEngine(object):
 	def clean_query(self, query):
 		tokens = nltk.word_tokenize(query)
 		# remove stop words
+		stop_words = set(stopwords.words('english')) 
+		tokens = [w for w in tokens if not w in stop_words]
 
 		# lematize all words
 		lemmatizer = WordNetLemmatizer()
-		lemmas = ' '.join([lemmatizer.lemmatize(word, get_wordnet_pos(word)) for word in tokens])
+		lemmas = ' '.join([lemmatizer.lemmatize(word, self.get_wordnet_pos(word)) for word in tokens])
 
 		return lemmas
 
@@ -70,16 +72,16 @@ class TempestEngine(object):
 		index = np.argmax(sim)
 		return self.replies[index]
 
-		def get_wordnet_pos(self, word):
-			"""Map POS tag to first character lemmatize() accepts"""
-			tag = nltk.pos_tag([word])[0][1][0].upper()
-			
-			tag_dict = {"J": wordnet.ADJ,
-					"N": wordnet.NOUN,
-					"V": wordnet.VERB,
-					"R": wordnet.ADV}
+	def get_wordnet_pos(self, word):
+		"""Map POS tag to first character lemmatize() accepts"""
+		tag = nltk.pos_tag([word])[0][1][0].upper()
+		
+		tag_dict = {"J": wordnet.ADJ,
+				"N": wordnet.NOUN,
+				"V": wordnet.VERB,
+				"R": wordnet.ADV}
 
-			return tag_dict.get(tag, wordnet.NOUN)		
+		return tag_dict.get(tag, wordnet.NOUN)		
 
 	def find_pos(self, query):
 		tokens = nltk.word_tokenize(query)
